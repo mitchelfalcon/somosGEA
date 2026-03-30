@@ -1,0 +1,7 @@
+{
+  "name": "GEA - Formulario Interactivo",
+  "description": "Formulario de investigación interactivo por voz sobre violencia de género.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
