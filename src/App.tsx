@@ -64,6 +64,50 @@ const formSteps: Step[] = [
   }
 ];
 
+const VoiceGraphic = ({ isSpeaking, isListening }: { isSpeaking: boolean, isListening: boolean }) => {
+  if (!isSpeaking && !isListening) {
+    return (
+      <div className="flex flex-col items-center justify-center my-8 h-48">
+        <div className="w-32 h-32 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center opacity-50">
+          <Volume2 className="w-8 h-8 text-[#d4a5c9]" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center my-8 h-48">
+      {isSpeaking ? (
+        <div className="relative w-40 h-40 flex items-center justify-center">
+          <div className="absolute inset-0 bg-gradient-to-tr from-[#d4a5c9]/40 to-[#e6b8c9]/40 rounded-full animate-spin-slow blur-md"></div>
+          <div className="absolute inset-2 bg-gradient-to-bl from-[#ff8fa3]/40 to-[#d4a5c9]/40 rounded-full animate-reverse-spin blur-sm"></div>
+          <div className="absolute inset-6 bg-white/40 backdrop-blur-xl rounded-full shadow-[0_0_30px_rgba(212,165,201,0.5)] animate-pulse flex items-center justify-center border border-white/60">
+             <Volume2 className="w-10 h-10 text-[#8e6b88] animate-bounce" />
+          </div>
+        </div>
+      ) : (
+        <div className="relative w-40 h-40 flex items-center justify-center">
+          <div className="absolute inset-0 bg-gradient-to-tr from-[#ff8fa3]/30 to-[#ff4d6d]/30 rounded-full animate-ping opacity-50 blur-md"></div>
+          <div className="absolute inset-6 bg-white/50 backdrop-blur-2xl rounded-full shadow-[0_0_40px_rgba(255,143,163,0.6)] flex items-center justify-center border border-white/70">
+             <div className="flex gap-1.5 items-center h-12">
+                {[...Array(5)].map((_, i) => (
+                  <div 
+                    key={i}
+                    className="w-2 bg-[#ff4d6d] rounded-full animate-waveform"
+                    style={{ animationDelay: `${i * 0.1}s`, height: i % 2 === 0 ? '60%' : '100%' }}
+                  ></div>
+                ))}
+             </div>
+          </div>
+        </div>
+      )}
+      <p className="mt-6 text-xs sm:text-sm font-bold text-[#8e6b88]/80 uppercase tracking-widest">
+        {isSpeaking ? 'Explicando pregunta...' : 'Escuchando tu respuesta...'}
+      </p>
+    </div>
+  );
+};
+
 // --- COMPONENTE PRINCIPAL ---
 
 export default function App() {
@@ -475,8 +519,8 @@ Si la respuesta es ambigua, no tiene sentido, o no coincide con las opciones, es
       <div className="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-[#d4a5c9] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
 
       {/* Header GEA */}
-      <div className="absolute top-6 left-6 flex items-center gap-4 z-10">
-        <div className="w-24 h-16 rounded-2xl flex items-center justify-center shadow-lg bg-white/50 backdrop-blur-md border border-white/40 overflow-hidden p-2">
+      <div className="absolute top-4 left-4 sm:top-6 sm:left-6 flex items-center gap-3 sm:gap-4 z-10">
+        <div className="w-16 h-12 sm:w-24 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg bg-white/50 backdrop-blur-md border border-white/40 overflow-hidden p-1.5 sm:p-2">
            <img src="https://storage.googleapis.com/aistudio-user-content/0-1743349942971-image.png" alt="GEA Logo" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
         </div>
         <div className="hidden sm:block">
@@ -485,112 +529,113 @@ Si la respuesta es ambigua, no tiene sentido, o no coincide con las opciones, es
         </div>
       </div>
 
-      <div className="max-w-3xl w-full bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-2xl overflow-hidden border border-white/50 z-10 relative">
+      <div className="max-w-3xl w-full bg-white/40 backdrop-blur-2xl rounded-[2rem] shadow-[0_8px_32px_0_rgba(212,165,201,0.37)] overflow-hidden border border-white/50 z-10 relative">
         
         {/* Barra de progreso */}
-        <div className="w-full bg-[#f3d9e4]/50 h-2">
+        <div className="w-full bg-[#f3d9e4]/30 h-1.5">
           <div 
-            className="bg-gradient-to-r from-[#d4a5c9] to-[#e6b8c9] h-2 transition-all duration-500 ease-out"
+            className="bg-gradient-to-r from-[#d4a5c9] to-[#ff8fa3] h-1.5 transition-all duration-700 ease-out shadow-[0_0_10px_rgba(212,165,201,0.8)]"
             style={{ width: `${(currentStepIndex / (formSteps.length - 1)) * 100}%` }}
           ></div>
         </div>
 
-        <div className="p-8 sm:p-12">
-          {/* Indicador de Bloque */}
-          {currentStep.block && (
-            <div className="inline-block bg-[#fcf0f4] text-[#b886ab] text-xs font-bold px-4 py-1.5 rounded-full mb-8 uppercase tracking-wider border border-[#f3d9e4]">
-              {currentStep.block}
+        <div className="p-6 sm:p-12 flex flex-col items-center">
+          {/* Indicadores superiores (Progreso y Bloque) */}
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+            <div className="inline-block bg-gradient-to-r from-[#d4a5c9]/20 to-[#ff8fa3]/20 backdrop-blur-md text-[#8e6b88] text-xs font-bold px-4 py-1.5 sm:px-5 sm:py-2 rounded-full uppercase tracking-widest border border-white/50 shadow-sm">
+              Paso {currentStepIndex + 1} de {formSteps.length}
             </div>
-          )}
-
-          {/* Texto de la Pregunta / Info */}
-          <div className="relative mb-12">
-            <h2 className="text-2xl sm:text-3xl font-medium text-[#5a4a58] leading-relaxed">
-              {currentStep.text}
-            </h2>
-            
-            {/* Indicador visual de que está hablando */}
-            {isSpeaking && (
-              <div className="absolute -left-8 top-3 flex flex-col gap-1.5">
-                <span className="w-2 h-2 bg-[#d4a5c9] rounded-full animate-ping"></span>
-                <span className="w-2 h-2 bg-[#e6b8c9] rounded-full animate-ping" style={{ animationDelay: '0.2s' }}></span>
-                <span className="w-2 h-2 bg-[#d4a5c9] rounded-full animate-ping" style={{ animationDelay: '0.4s' }}></span>
+            {currentStep.block && (
+              <div className="inline-block bg-white/30 backdrop-blur-md text-[#b886ab] text-xs font-bold px-4 py-1.5 sm:px-5 sm:py-2 rounded-full uppercase tracking-widest border border-white/40 shadow-sm">
+                {currentStep.block}
               </div>
             )}
           </div>
 
+          {/* Texto de la Pregunta / Info */}
+          <div className="relative mb-6 sm:mb-8 w-full">
+            {currentStep.id === 'intro' && (
+              <div className="flex justify-center mb-8">
+                <div className="w-32 h-32 sm:w-48 sm:h-48 rounded-[2rem] flex items-center justify-center shadow-[0_20px_50px_rgba(212,165,201,0.5)] bg-white/40 backdrop-blur-2xl border border-white/60 overflow-hidden p-4 sm:p-6 transform transition-all duration-700 hover:scale-105 hover:rotate-3">
+                   <img src="https://storage.googleapis.com/aistudio-user-content/0-1743349942971-image.png" alt="GEA Logo" className="w-full h-full object-contain drop-shadow-xl" referrerPolicy="no-referrer" />
+                </div>
+              </div>
+            )}
+            <h2 className="text-xl sm:text-3xl font-medium text-[#5a4a58] leading-relaxed text-center drop-shadow-sm">
+              {currentStep.text}
+            </h2>
+          </div>
+
+          <VoiceGraphic isSpeaking={isSpeaking} isListening={isListening} />
+
           {/* Controles de Voz */}
-          <div className="flex flex-col items-center justify-center mb-12">
+          <div className="flex flex-col items-center justify-center mb-8 sm:mb-12 w-full">
             <div className="relative">
               {/* Glow effect behind button */}
-              <div className={`absolute inset-0 rounded-full blur-xl transition-all duration-500 ${
-                isListening ? 'bg-[#ff8fa3] opacity-60 scale-150' : 
-                isProcessing ? 'bg-[#ffd166] opacity-40 scale-125' : 
-                'bg-[#d4a5c9] opacity-40 scale-110'
+              <div className={`absolute inset-0 rounded-full blur-2xl transition-all duration-700 ${
+                isListening ? 'bg-[#ff8fa3] opacity-80 scale-[1.8]' : 
+                isProcessing ? 'bg-[#ffd166] opacity-60 scale-[1.5]' : 
+                'bg-[#d4a5c9] opacity-50 scale-[1.3]'
               }`}></div>
               
               <button
                 onClick={toggleListening}
                 disabled={!speechSupported || isProcessing}
-                className={`relative group flex items-center justify-center w-28 h-28 rounded-full transition-all duration-300 shadow-xl border-4 border-white/50 ${
+                className={`relative group flex items-center justify-center w-24 h-24 sm:w-32 sm:h-32 rounded-full transition-all duration-500 shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-white/60 backdrop-blur-xl ${
                   isListening 
-                    ? 'bg-gradient-to-br from-[#ff8fa3] to-[#ff4d6d] hover:scale-105' 
+                    ? 'bg-gradient-to-br from-[#ff8fa3]/80 to-[#ff4d6d]/80 hover:scale-110' 
                     : isProcessing
-                    ? 'bg-gradient-to-br from-[#ffd166] to-[#ffb703] cursor-wait'
-                    : 'bg-gradient-to-br from-[#d4a5c9] to-[#c293b7] hover:scale-105'
+                    ? 'bg-gradient-to-br from-[#ffd166]/80 to-[#ffb703]/80 cursor-wait'
+                    : 'bg-gradient-to-br from-[#d4a5c9]/80 to-[#c293b7]/80 hover:scale-110'
                 } ${(!speechSupported) && 'opacity-50 cursor-not-allowed'}`}
               >
                 {isListening ? (
                   <>
-                    <span className="absolute inset-0 rounded-full bg-white/20 animate-ping"></span>
-                    <Square className="text-white relative z-10" size={36} fill="currentColor" />
+                    <span className="absolute inset-0 rounded-full bg-white/30 animate-ping"></span>
+                    <Square className="text-white relative z-10 drop-shadow-md" size={32} fill="currentColor" />
                   </>
                 ) : isProcessing ? (
-                  <RefreshCw className="text-white animate-spin" size={36} />
+                  <RefreshCw className="text-white animate-spin drop-shadow-md" size={32} />
                 ) : (
-                  <Mic className="text-white" size={44} />
+                  <Mic className="text-white drop-shadow-md" size={40} />
                 )}
               </button>
             </div>
-            <p className="mt-6 text-sm font-medium text-[#a88b9f]">
-              {isListening ? 'Escuchando activamente... (se detendrá al terminar de hablar)' : isProcessing ? 'Procesando con IA...' : 'Toca el micrófono para hablar'}
+            <p className="mt-8 text-xs sm:text-sm font-semibold text-[#8e6b88] tracking-wide uppercase bg-white/30 px-4 py-1.5 rounded-full backdrop-blur-sm border border-white/40">
+              {isListening ? 'Escuchando activamente...' : isProcessing ? 'Procesando con IA...' : 'Toca para hablar'}
             </p>
             
             {/* Transcripción en vivo */}
             {transcript && (
-              <div className="mt-6 px-8 py-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-[#f3d9e4] w-full text-center italic text-[#8e6b88] shadow-sm">
+              <div className="mt-6 px-6 py-4 bg-white/40 backdrop-blur-xl rounded-2xl border border-white/50 w-full max-w-md text-center italic text-[#5a4a58] shadow-lg">
                 "{transcript}"
               </div>
             )}
 
             {/* Error de validación de voz */}
             {voiceError && (
-              <div className="mt-4 px-6 py-3 bg-[#fff0f0] rounded-2xl border border-[#ffcdd2] w-full text-center text-[#d32f2f] shadow-sm flex items-center justify-center gap-2 animate-in fade-in slide-in-from-bottom-2">
+              <div className="mt-4 px-6 py-3 bg-[#ff4d6d]/10 backdrop-blur-md rounded-2xl border border-[#ff4d6d]/30 w-full max-w-md text-center text-[#d32f2f] shadow-lg flex items-center justify-center gap-2 animate-in fade-in slide-in-from-bottom-2">
                 <AlertCircle size={18} />
                 <span className="text-sm font-medium">{voiceError}</span>
               </div>
             )}
           </div>
 
-          {/* Opciones Manuales (Fallback / Alternativa) */}
-          <div className="space-y-4">
+          {/* Opciones (Solo lectura, responder por voz) */}
+          <div className="w-full max-w-lg">
             {currentStep.type === 'info' ? (
-              <button
-                onClick={handleNext}
-                className="w-full flex items-center justify-center gap-2 bg-[#fcf0f4] hover:bg-[#f3d9e4] text-[#8e6b88] py-5 rounded-2xl font-semibold transition-all border border-[#f3d9e4] hover:shadow-md"
-              >
-                Continuar <ChevronRight size={20} />
-              </button>
+              <div className="w-full flex items-center justify-center gap-2 bg-white/30 backdrop-blur-xl text-[#8e6b88] py-4 rounded-2xl font-medium border border-white/50 shadow-lg text-center text-sm sm:text-base">
+                Di "Continuar" o "Sí" para avanzar
+              </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
                 {currentStep.options?.map((opt, idx) => (
-                  <button
+                  <div
                     key={idx}
-                    onClick={() => handleAnswer(opt)}
-                    className="flex items-center justify-center py-5 px-6 bg-white border-2 border-[#f3d9e4] hover:border-[#d4a5c9] hover:bg-[#fcf0f4] text-[#8e6b88] rounded-2xl font-medium transition-all shadow-sm hover:shadow-md"
+                    className="flex items-center justify-center py-2.5 px-5 sm:py-3 sm:px-6 bg-white/30 backdrop-blur-xl border border-white/50 text-[#5a4a58] rounded-full font-semibold shadow-md text-center text-xs sm:text-sm transition-all hover:bg-white/40"
                   >
                     {opt}
-                  </button>
+                  </div>
                 ))}
               </div>
             )}
@@ -599,13 +644,13 @@ Si la respuesta es ambigua, no tiene sentido, o no coincide con las opciones, es
         </div>
         
         {/* Footer info */}
-        <div className="bg-white/40 backdrop-blur-md p-5 flex items-center justify-between border-t border-[#f3d9e4]/50">
-          <div className="flex items-center gap-2 text-xs font-medium text-[#a88b9f]">
-            <Volume2 size={16} className={isSpeaking ? 'text-[#d4a5c9]' : ''} />
+        <div className="bg-white/20 backdrop-blur-2xl p-4 sm:p-5 flex items-center justify-between border-t border-white/30">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#8e6b88] tracking-wide">
+            <Volume2 size={16} className={isSpeaking ? 'text-[#d4a5c9] animate-pulse' : 'opacity-50'} />
             {isSpeaking ? 'Asistente hablando...' : 'Asistente en espera'}
           </div>
           {!speechSupported && (
-            <div className="flex items-center gap-1.5 text-xs text-[#ff8fa3] font-medium bg-[#ff8fa3]/10 px-3 py-1.5 rounded-full">
+            <div className="flex items-center gap-1.5 text-xs text-[#ff4d6d] font-bold bg-[#ff4d6d]/10 px-3 py-1.5 rounded-full border border-[#ff4d6d]/20">
               <AlertCircle size={14} />
               Micrófono no soportado
             </div>
